@@ -1072,11 +1072,15 @@
       "moreActions": "Weitere Aktionen",
       "none": "Kein Fahrzeug",
       "notReachable": "Fahrzeug war nicht erreichbar. Versuche evcc neu zu starten.",
+      "retryConnection": "Klicken zum Erneut versuchen",
       "targetSoc": "Ladelimit",
       "temp": "Temperatur",
       "tempLimit": "Temperaturlimit",
       "unknown": "Gastfahrzeug",
-      "vehicleSoc": "Ladestand"
+      "vehicleSoc": "Ladestand",
+      "updateNow": "gerade eben",
+      "updateMinutesAgo": "vor {minutes}m",
+      "updateHoursAgo": "vor {hours}h"
     },
     "vehicleStatus": {
       "awaitingAuthorization": "Warte auf Autorisierung.",

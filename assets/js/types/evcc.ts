@@ -516,6 +516,7 @@ export interface Vehicle {
   features?: string[];
   capacity?: number;
   icon?: string;
+  lastUpdate?: string;
 }
 
 export type Timeout = ReturnType<typeof setInterval> | null;

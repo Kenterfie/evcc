@@ -31,6 +31,7 @@ type vehicleStruct struct {
 	Plan           *planStruct         `json:"plan,omitempty"`
 	RepeatingPlans []api.RepeatingPlan `json:"repeatingPlans"`
 	PlanStrategy   api.PlanStrategy    `json:"planStrategy"`
+	LastUpdate     time.Time           `json:"lastUpdate,omitempty"`
 }
 
 // publishVehicles returns a list of vehicle titles
@@ -68,6 +69,7 @@ func (site *Site) publishVehicles() {
 			Plan:           plan,
 			RepeatingPlans: v.GetRepeatingPlans(),
 			PlanStrategy:   v.GetPlanStrategy(),
+			LastUpdate:     time.Now(),
 		}
 
 		// publish effective plan strategy immediately for soc-based planning

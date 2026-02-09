@@ -1,23 +1,46 @@
 <template>
 	<div class="vehicle-soc">
 		<div class="progress">
+			<!-- Current SOC up to limit (green/primary) -->
 			<div
-				v-if="connected"
+				v-if="connected && socUpToLimitWidth > 0"
 				class="progress-bar"
 				role="progressbar"
 				:class="{
 					[progressColor]: true,
+					'progress-bar-striped': charging && vehicleSoc <= visibleLimitSoc,
+					'progress-bar-animated': charging && vehicleSoc <= visibleLimitSoc,
+				}"
+				:style="{ width: `${socUpToLimitWidth}%`, ...transition }"
+			></div>
+			<!-- Current SOC beyond limit (orange/warning) -->
+			<div
+				v-if="connected && socBeyondLimitWidth > 0"
+				class="progress-bar bg-warning"
+				role="progressbar"
+				:class="{
 					'progress-bar-striped': charging,
 					'progress-bar-animated': charging,
 				}"
-				:style="{ width: `${vehicleSocDisplayWidth}%`, ...transition }"
+				:style="{ width: `${socBeyondLimitWidth}%`, ...transition }"
 			></div>
+			<!-- Remaining to reach limit when below limit (grey/secondary) -->
 			<div
-				v-if="remainingSocWidth !== null && remainingSocWidth > 0 && enabled && connected"
+				v-if="connected && remainingToLimitWidth > 0 && enabled"
+				class="progress-bar bg-secondary"
+				role="progressbar"
+				:class="{
+					'progress-bar-striped': charging,
+					'progress-bar-animated': charging,
+				}"
+				:style="{ width: `${remainingToLimitWidth}%`, ...transition }"
+			></div>
+			<!-- Beyond limit to 100% (dark grey/muted) -->
+			<div
+				v-if="connected && beyondLimitWidth > 0"
 				class="progress-bar bg-muted"
 				role="progressbar"
-				:class="progressColor"
-				:style="{ width: `${remainingSocWidth}%`, ...transition }"
+				:style="{ width: `${beyondLimitWidth}%`, ...transition }"
 			></div>
 			<div
 				v-show="vehicleLimitSoc"
@@ -121,6 +144,73 @@ export default defineComponent({
 				return 100;
 			}
 		},
+		socUpToLimitWidth() {
+			// Green bar: current SOC up to limit, or just current SOC if no limit
+			const currentSoc = this.vehicleSocDisplayWidth;
+			const userLimit = this.visibleLimitSoc;
+
+			if (!this.socBasedCharging) {
+				return currentSoc;
+			}
+
+			// No limit set: show full current SOC in green
+			if (!userLimit || userLimit === 0) {
+				return currentSoc;
+			}
+
+			// Limit set: green bar goes up to minimum of (current SOC, limit)
+			return Math.min(currentSoc, userLimit);
+		},
+		socBeyondLimitWidth() {
+			// Orange bar: SOC beyond the user limit (only when SOC > limit)
+			const currentSoc = this.vehicleSocDisplayWidth;
+			const userLimit = this.visibleLimitSoc;
+
+			if (!this.socBasedCharging || !userLimit || userLimit === 0) {
+				return 0;
+			}
+
+			// Show orange only when current SOC exceeds the limit
+			if (currentSoc > userLimit) {
+				return currentSoc - userLimit;
+			}
+
+			return 0;
+		},
+		remainingToLimitWidth() {
+			// Light grey bar: remaining to reach limit (only when SOC < limit)
+			const currentSoc = this.vehicleSocDisplayWidth;
+			const userLimit = this.visibleLimitSoc;
+
+			if (!this.socBasedCharging || !userLimit || userLimit === 0) {
+				return 0;
+			}
+
+			// Show light grey only when current SOC is below the limit
+			if (currentSoc < userLimit) {
+				return userLimit - currentSoc;
+			}
+
+			return 0;
+		},
+		beyondLimitWidth() {
+			// Dark grey bar: remaining capacity from limit/SOC to 100%
+			const currentSoc = this.vehicleSocDisplayWidth;
+			const userLimit = this.visibleLimitSoc;
+
+			if (!this.socBasedCharging) {
+				return 0;
+			}
+
+			// No limit set: show grey from current SOC to 100%
+			if (!userLimit || userLimit === 0) {
+				return 100 - currentSoc;
+			}
+
+			// Limit set: show grey from max(SOC, limit) to 100%
+			const startPoint = Math.max(currentSoc, userLimit);
+			return 100 - startPoint;
+		},
 		transition() {
 			if (this.dragging) {
 				return { transition: "none" };
@@ -182,29 +272,9 @@ export default defineComponent({
 		minSocActive() {
 			return this.minSoc > 0 && this.vehicleSoc < this.minSoc;
 		},
-		remainingSocWidth() {
-			if (this.socBasedCharging) {
-				if (this.vehicleSocDisplayWidth === 100) {
-					return null;
-				}
-				if (this.minSocActive) {
-					return this.minSoc - this.vehicleSoc;
-				}
-				const limit = Math.min(
-					this.vehicleLimitSoc || 100,
-					Math.max(this.visibleLimitSoc, this.effectivePlanSoc || 0)
-				);
-				if (limit > this.vehicleSoc) {
-					return limit - this.vehicleSoc;
-				}
-			} else {
-				return 100 - this.vehicleSocDisplayWidth;
-			}
-
-			return null;
-		},
 		visibleLimitSoc() {
-			return Number(this.selectedLimitSoc || this.effectiveLimitSoc);
+			const value = Number(this.selectedLimitSoc || this.effectiveLimitSoc);
+			return isNaN(value) ? 0 : value;
 		},
 	},
 	watch: {
@@ -274,8 +344,25 @@ export default defineComponent({
 	font-size: 1rem;
 	background: var(--evcc-background);
 }
-.progress-bar.bg-muted {
+.progress-bar {
+	background-color: var(--bs-primary) !important;
+}
+.progress-bar.bg-primary {
+	background-color: var(--bs-primary) !important;
+}
+.progress-bar.bg-secondary {
+	background-color: var(--bs-gray-medium) !important;
 	opacity: 0.5;
+}
+.progress-bar.bg-warning {
+	background-color: var(--evcc-orange) !important;
+}
+.progress-bar.bg-danger {
+	background-color: var(--bs-danger) !important;
+}
+.progress-bar.bg-muted {
+	background-color: var(--evcc-background) !important;
+	opacity: 1;
 }
 .bg-light {
 	color: var(--bs-gray-dark);

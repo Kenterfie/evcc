@@ -1072,11 +1072,15 @@
       "moreActions": "More actions",
       "none": "No vehicle",
       "notReachable": "Vehicle was not reachable. Try restarting evcc.",
+      "retryConnection": "Click to retry connection",
       "targetSoc": "Limit",
       "temp": "Temp.",
       "tempLimit": "Temp. limit",
       "unknown": "Guest vehicle",
-      "vehicleSoc": "Charge"
+      "vehicleSoc": "Charge",
+      "updateNow": "just now",
+      "updateMinutesAgo": "{minutes}m ago",
+      "updateHoursAgo": "{hours}h ago"
     },
     "vehicleStatus": {
       "awaitingAuthorization": "Waiting for authorization.",

@@ -179,7 +179,11 @@ export default defineComponent({
 			return this.collectProps(Status);
 		},
 		vehicleTitleProps() {
-			return this.collectProps(Title);
+			const props = this.collectProps(Title);
+			if (this.vehicle?.lastUpdate) {
+				props.lastUpdate = this.vehicle.lastUpdate;
+			}
+			return props;
 		},
 		chargingPlan() {
 			return this.collectProps(ChargingPlan);
