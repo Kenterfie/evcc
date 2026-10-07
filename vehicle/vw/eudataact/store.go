@@ -152,6 +152,17 @@ func (s *store) snapshot(vin string) []point {
 	return slices.Clone(v.data)
 }
 
+// dataUpdatedAt returns the delivery time of the newest merged dataset for vin,
+// zero if no data has been received yet.
+func (s *store) dataUpdatedAt(vin string) time.Time {
+	v := s.state(vin)
+
+	v.mu.Lock()
+	defer v.mu.Unlock()
+
+	return v.after
+}
+
 // logData logs every data point at DEBUG level in arrival order, with its value
 // and own timestamp in local time.
 func logData(log *util.Logger, data []point) {

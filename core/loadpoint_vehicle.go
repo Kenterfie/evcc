@@ -169,6 +169,7 @@ func (lp *Loadpoint) setActiveVehicle(v api.Vehicle) {
 
 	if v != nil {
 		lp.socUpdated = time.Time{}
+		lp.publishVehicleSocUpdated()
 
 		// resolve optional config
 		if v.Capacity() > 0 && (lp.Soc.Estimate == nil || *lp.Soc.Estimate) {
@@ -268,9 +269,11 @@ func (lp *Loadpoint) unpublishVehicleIdentity() {
 func (lp *Loadpoint) unpublishVehicle() {
 	lp.vehicleSoc = 0
 	lp.vehicleRange = 0
+	lp.socUpdated = time.Time{}
 
 	lp.publish(keys.VehicleClimaterActive, nil)
 	lp.publish(keys.VehicleSoc, 0.0)
+	lp.publishVehicleSocUpdated()
 	lp.publish(keys.VehicleRange, int64(0))
 	lp.publish(keys.VehicleLimitSoc, 0.0)
 	lp.publish(keys.VehicleOdometer, 0.0)

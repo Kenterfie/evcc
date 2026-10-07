@@ -176,6 +176,11 @@ type VehicleOdometer interface {
 	Odometer() (float64, error)
 }
 
+// VehicleDataTimestamp provides the timestamp of the newest vehicle data as delivered by its source
+type VehicleDataTimestamp interface {
+	DataUpdated() (time.Time, error)
+}
+
 // VehiclePosition returns the vehicles position in latitude and longitude
 type VehiclePosition interface {
 	Position() (float64, float64, error)

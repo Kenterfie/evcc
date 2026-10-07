@@ -176,6 +176,7 @@ export default defineComponent({
 		vehicleRange: { type: Number, default: 0 },
 		vehicles: Array,
 		vehicleSoc: { type: Number, default: 0 },
+		vehicleSocUpdated: String as PropType<string | null>,
 		vehicleLimitSoc: Number,
 		vehicleNotReachable: Boolean,
 		minSocNotReached: Boolean,

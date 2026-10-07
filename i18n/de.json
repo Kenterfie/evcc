@@ -1769,6 +1769,7 @@
       "feedinPriorityNextStart": "Hohe Einspeisevergütungen beginnen in {duration}.",
       "feedinPriorityPausing": "Solarladen pausiert, um die Einspeisung zu maximieren.",
       "finished": "Abgeschlossen.",
+      "lastUpdate": "Letzte Fahrzeugaktualisierung.",
       "minCharge": "Mindestladung bis {soc}.",
       "pvDisable": "Zu wenig Überschuss. Ladung wird gleich pausiert.",
       "pvEnable": "Überschuss verfügbar. Ladung wird gleich fortgesetzt.",

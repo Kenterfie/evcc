@@ -125,6 +125,11 @@ export default function setupRouter(i18n: VueI18nInstance) {
         props: true,
       },
       {
+        path: "/cars",
+        component: () => import("./views/Cars.vue"),
+        props: true,
+      },
+      {
         path: "/energy",
         component: () => import("./views/Energy.vue"),
         props: (route) => {

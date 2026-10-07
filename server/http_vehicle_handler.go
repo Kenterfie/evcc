@@ -239,3 +239,75 @@ func planSocRemoveHandler(site site.API) http.HandlerFunc {
 		jsonWrite(w, struct{}{})
 	}
 }
+
+// vehicleStatusHandler returns live vehicle status (soc, range, odometer,
+// charge state). Values are served through the vehicle's cached getters so a
+// call within the configured poll interval costs no additional API request.
+func vehicleStatusHandler(site site.API) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		v, err := site.Vehicles().ByName(vars["name"])
+		if err != nil {
+			jsonError(w, http.StatusBadRequest, err)
+			return
+		}
+
+		instance := v.Instance()
+
+		res := struct {
+			Soc          *float64         `json:"soc"`
+			Range        *int64           `json:"range"`
+			Odometer     *float64         `json:"odometer"`
+			ChargeStatus api.ChargeStatus `json:"chargeStatus"`
+			Updated      *time.Time       `json:"updated,omitempty"`
+		}{
+			ChargeStatus: api.StatusA,
+		}
+
+		// fall back to the scrape time when the data source provides no timestamp
+		scrapeTime := time.Now()
+		read := func(val any) {
+			if val != nil && res.Updated == nil {
+				res.Updated = &scrapeTime
+			}
+		}
+
+		if b, ok := api.Cap[api.Battery](instance); ok {
+			if soc, err := b.Soc(); err == nil && soc > 0 {
+				res.Soc = &soc
+				read(soc)
+			}
+		}
+
+		if vr, ok := api.Cap[api.VehicleRange](instance); ok {
+			if rng, err := vr.Range(); err == nil && rng > 0 {
+				res.Range = &rng
+				read(rng)
+			}
+		}
+
+		if vo, ok := api.Cap[api.VehicleOdometer](instance); ok {
+			if odo, err := vo.Odometer(); err == nil && odo > 0 {
+				res.Odometer = &odo
+				read(odo)
+			}
+		}
+
+		if cs, ok := api.Cap[api.ChargeState](instance); ok {
+			if status, err := cs.Status(); err == nil && status != api.StatusA {
+				res.ChargeStatus = status
+				read(status)
+			}
+		}
+
+		// prefer the data source's own timestamp over evcc's scrape time
+		if dt, ok := api.Cap[api.VehicleDataTimestamp](instance); ok {
+			if ts, err := dt.DataUpdated(); err == nil && !ts.IsZero() {
+				res.Updated = &ts
+			}
+		}
+
+		jsonWrite(w, res)
+	}
+}

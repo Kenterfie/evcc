@@ -198,6 +198,7 @@ export default defineComponent({
 		vehicleDetectionActive: Boolean,
 		vehicleRange: Number,
 		vehicleSoc: { type: Number, default: 0 },
+		vehicleSocUpdated: String as PropType<string | null>,
 		minSocNotReached: Boolean,
 		vehicleName: String,
 		vehicleIcon: String,

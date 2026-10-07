@@ -27,12 +27,14 @@ const (
 // soon as the portal delivers a new dataset.
 type Provider struct {
 	statusG func() ([]point, error)
+	store   *store
+	vin     string
 }
 
 // NewProvider creates a vehicle api provider
 func NewProvider(log *util.Logger, api *API, vin string, cache time.Duration) *Provider {
-	v := &Provider{}
 	s := sharedStore(api)
+	v := &Provider{store: s, vin: vin}
 
 	var cached util.Cacheable[[]point]
 	cached = util.ResettableCached(func() ([]point, error) {
@@ -86,6 +88,18 @@ func (v *Provider) Soc() (float64, error) {
 	}
 
 	return 0, api.ErrNotAvailable
+}
+
+var _ api.VehicleDataTimestamp = (*Provider)(nil)
+
+// DataUpdated returns the delivery time of the newest dataset from the portal.
+// This is the true data source timestamp, not evcc's scrape time.
+func (v *Provider) DataUpdated() (time.Time, error) {
+	ts := v.store.dataUpdatedAt(v.vin)
+	if ts.IsZero() {
+		return time.Time{}, api.ErrNotAvailable
+	}
+	return ts, nil
 }
 
 var _ api.VehicleRange = (*Provider)(nil)

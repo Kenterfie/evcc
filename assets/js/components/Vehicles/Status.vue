@@ -141,6 +141,7 @@ export default defineComponent({
 		vehicleClimaterActive: Boolean,
 		vehicleWelcomeActive: Boolean,
 		vehicleLimitSoc: { type: Number, default: 0 },
+		vehicleSocUpdated: String,
 		statusOverride: { type: Object as PropType<VehicleStatus>, default: undefined },
 	},
 	emits: ["open-loadpoint-settings", "open-minsoc-settings", "open-plan-modal"],
@@ -340,6 +341,16 @@ export default defineComponent({
 					iconComponent: ReconnectIcon,
 					itemClass: "text-warning",
 					testId: "vehicle-status-disconnect-required",
+				},
+				{
+					id: "lastUpdate",
+					visible: !this.heating && Boolean(this.vehicleSocUpdated),
+					content: this.vehicleSocUpdated
+						? this.fmtAbsoluteDate(new Date(this.vehicleSocUpdated))
+						: "",
+					tooltipContent: t("lastUpdate"),
+					iconComponent: "shopicon-regular-clock",
+					testId: "vehicle-status-last-update",
 				},
 				{
 					id: "smartCost",

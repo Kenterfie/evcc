@@ -1769,6 +1769,7 @@
       "feedinPriorityNextStart": "High feed-in rates start in {duration}.",
       "feedinPriorityPausing": "Solar charging paused to maximize feed-in.",
       "finished": "Finished.",
+      "lastUpdate": "Last vehicle update.",
       "minCharge": "Minimum charging to {soc}.",
       "pvDisable": "Not enough surplus. Pausing soon.",
       "pvEnable": "Surplus available. Starting soon.",

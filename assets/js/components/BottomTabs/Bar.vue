@@ -30,6 +30,10 @@
 				<SessionsIcon class="tab-icon" />
 			</Item>
 
+			<Item to="/cars" :label="$t('config.section.vehicles')">
+				<shopicon-regular-car3 class="tab-icon"></shopicon-regular-car3>
+			</Item>
+
 			<MoreItem
 				:active="moreActive"
 				:vehicles="vehicles"
@@ -49,6 +53,7 @@
 
 <script lang="ts">
 import "@h2d2/shopicons/es/regular/lightning";
+import "@h2d2/shopicons/es/regular/car3";
 import ForecastGraphIcon from "../MaterialIcon/ForecastGraph.vue";
 import SessionsIcon from "../MaterialIcon/Sessions.vue";
 import SankeyIcon from "../MaterialIcon/Sankey.vue";
@@ -102,7 +107,7 @@ export default defineComponent({
 			return (this.battery?.devices?.length ?? 0) > 0;
 		},
 		moreActive() {
-			const mainTabs = ["/", "/energy", "/battery", "/forecast", "/sessions"];
+			const mainTabs = ["/", "/energy", "/battery", "/forecast", "/sessions", "/cars"];
 			return !mainTabs.includes(this.$route.path);
 		},
 	},

@@ -538,6 +538,15 @@ func (lp *Loadpoint) publish(key string, val any) {
 	lp.uiChan <- util.Param{Key: key, Val: val}
 }
 
+func (lp *Loadpoint) publishVehicleSocUpdated() {
+	if lp.socUpdated.IsZero() {
+		lp.publish(keys.VehicleSocUpdated, nil)
+		return
+	}
+
+	lp.publish(keys.VehicleSocUpdated, lp.socUpdated)
+}
+
 // evChargeStartHandler sends external start event
 func (lp *Loadpoint) evChargeStartHandler() {
 	lp.log.INFO.Println("start charging ->")
@@ -550,6 +559,7 @@ func (lp *Loadpoint) evChargeStartHandler() {
 
 	// soc update reset
 	lp.socUpdated = time.Time{}
+	lp.publishVehicleSocUpdated()
 
 	// set created when first charging session segment starts
 	lp.updateSession(func(session *session.Session) {
@@ -571,6 +581,7 @@ func (lp *Loadpoint) evChargeStopHandler() {
 	// soc update reset
 	util.ResetCached()
 	lp.socUpdated = time.Time{}
+	lp.publishVehicleSocUpdated()
 
 	// reset pv enable/disable timer
 	// https://github.com/evcc-io/evcc/issues/2289
@@ -591,6 +602,7 @@ func (lp *Loadpoint) evVehicleConnectHandler() {
 
 	// soc update reset
 	lp.socUpdated = time.Time{}
+	lp.publishVehicleSocUpdated()
 
 	// charger may have reconfigured phases internally while disconnected
 	if err := lp.syncChargerPhases(); err != nil {
@@ -668,6 +680,7 @@ func (lp *Loadpoint) evVehicleDisconnectHandler() {
 
 	// soc update reset
 	lp.socUpdated = time.Time{}
+	lp.publishVehicleSocUpdated()
 
 	// boost
 	if err := lp.SetBatteryBoost(false); err != nil {
@@ -2226,6 +2239,7 @@ func (lp *Loadpoint) publishSocAndRange() {
 	} else if socR != nil {
 		lp.vehicleSoc = *socR
 	}
+	lp.publishVehicleSocUpdated()
 	lp.publish(keys.VehicleSoc, lp.vehicleSoc)
 
 	apiLimitSoc := 100

@@ -114,6 +114,7 @@ const (
 	VehicleOdometer        = "vehicleOdometer"        // vehicle odometer
 	VehicleRange           = "vehicleRange"           // vehicle range
 	VehicleSoc             = "vehicleSoc"             // vehicle soc
+	VehicleSocUpdated      = "vehicleSocUpdated"      // vehicle soc update timestamp
 	VehicleLimitSoc        = "vehicleLimitSoc"        // vehicle api soc limit
 	VehicleClimaterActive  = "vehicleClimaterActive"  // vehicle climater active
 	VehicleWelcomeActive   = "vehicleWelcomeActive"   // vehicle might need welcome charge

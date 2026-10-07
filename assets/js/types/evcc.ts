@@ -789,6 +789,7 @@ export interface Loadpoint {
   vehicleRange: number;
   /** Charge level of the connected vehicle in %. Temperature in degrees for heating devices. */
   vehicleSoc: number;
+  vehicleSocUpdated: string | null;
   /** Title of the connected vehicle for UI display. */
   vehicleTitle: string;
   /** A short welcome charge is active to enable vehicle communication. */
